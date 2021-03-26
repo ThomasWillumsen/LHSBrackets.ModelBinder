@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <PackageId>LHSBrackets.ModelBinder</PackageId>
+    <Authors>Thomas Leschley Andersen</Authors>
+    <Description>.NET Model binder for parsing query parameters that contains LHS Brackets</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageVersion>0.9.0</PackageVersion>
+    <RepositoryUrl>TODO</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>modelbinder, parse, lhs brackets, query, filters, rest, api</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.2.0" />
+  </ItemGroup>
+
+</Project>
