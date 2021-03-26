@@ -1,0 +1,39 @@
+name: publish to nuget
+on:
+  push:
+    branches:
+      - master
+jobs:
+  publish:
+    name: build, pack & publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      # Publish LHSBrackets.ModelBinder
+      - name: publish LHSBrackets.ModelBinder
+        id: publish_nuget
+        uses: rohith/publish-nuget@v2
+        with:
+          # Filepath of the project to be packaged, relative to root of repository
+          PROJECT_FILE_PATH: src/LHSBrackets.ModelBinder/LHSBrackets.ModelBinder.csproj
+
+          # Regex pattern to extract version info in a capturing group
+          VERSION_REGEX: ^\s*<PackageVersion>(.*)<\/PackageVersion>\s*$
+
+          # API key to authenticate with NuGet server
+          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+
+        # Publish LHSBrackets.ModelBinder.EF
+      - name: publish LHSBrackets.ModelBinder.EF
+        id: publish_nuget
+        uses: rohith/publish-nuget@v2
+        with:
+          # Filepath of the project to be packaged, relative to root of repository
+          PROJECT_FILE_PATH: src/LHSBrackets.ModelBinder.EF/LHSBrackets.ModelBinder.EF.csproj
+
+          # Regex pattern to extract version info in a capturing group
+          VERSION_REGEX: ^\s*<PackageVersion>(.*)<\/PackageVersion>\s*$
+
+          # API key to authenticate with NuGet server
+          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
