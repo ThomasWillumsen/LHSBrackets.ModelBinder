@@ -6,8 +6,8 @@
     <Authors>Thomas Leschley Andersen</Authors>
     <Description>Linq extension method to apply LHS bracket filters with Entity Framework</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageVersion>0.9.0</PackageVersion>
-    <RepositoryUrl>TODO</RepositoryUrl>
+    <PackageVersion>0.9.1</PackageVersion>
+    <RepositoryUrl>https://github.com/ThomasLeschley/LHSBrackets.ModelBinder</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>query, filters, linq, entity framework</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
