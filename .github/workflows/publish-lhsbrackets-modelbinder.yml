@@ -23,17 +23,3 @@ jobs:
 
           # API key to authenticate with NuGet server
           NUGET_KEY: ${{secrets.NUGET_API_KEY}}
-
-        # Publish LHSBrackets.ModelBinder.EF
-      - name: publish on version change
-        id: publish_nuget
-        uses: rohith/publish-nuget@v2
-        with:
-          # Filepath of the project to be packaged, relative to root of repository
-          PROJECT_FILE_PATH: src/LHSBrackets.ModelBinder.EF/LHSBrackets.ModelBinder.EF.csproj
-
-          # Regex pattern to extract version info in a capturing group
-          VERSION_REGEX: ^\s*<PackageVersion>(.*)<\/PackageVersion>\s*$
-
-          # API key to authenticate with NuGet server
-          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
