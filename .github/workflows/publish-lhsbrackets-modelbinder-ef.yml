@@ -1,4 +1,4 @@
-name: publish to nuget
+name: publish LHSBrackets.ModelBinder.EF to nuget
 on:
   push:
     branches:
