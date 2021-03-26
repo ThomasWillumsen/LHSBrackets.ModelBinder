@@ -12,7 +12,7 @@ jobs:
 
       # Publish LHSBrackets.ModelBinder
       - name: publish LHSBrackets.ModelBinder
-        id: publish_nuget
+        id: publish_LHSBrackets.ModelBinder
         uses: rohith/publish-nuget@v2
         with:
           # Filepath of the project to be packaged, relative to root of repository
@@ -26,7 +26,7 @@ jobs:
 
         # Publish LHSBrackets.ModelBinder.EF
       - name: publish LHSBrackets.ModelBinder.EF
-        id: publish_nuget
+        id: publish_LHSBrackets.ModelBinder.EF
         uses: rohith/publish-nuget@v2
         with:
           # Filepath of the project to be packaged, relative to root of repository
