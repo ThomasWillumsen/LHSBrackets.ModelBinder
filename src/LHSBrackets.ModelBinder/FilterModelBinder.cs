@@ -13,9 +13,9 @@ namespace LHSBrackets.ModelBinder
 
             var resultModel = Activator.CreateInstance(bindingContext.ModelType);
             if (resultModel is FilterRequest == false)
-                throw new ArgumentException($"The modeltype {resultModel.GetType()} does not inherit from {typeof(FilterRequest)}");
+                throw new ArgumentException($"The modeltype {resultModel?.GetType()} does not inherit from {typeof(FilterRequest)}");
 
-            var binders = (resultModel as FilterRequest).GetBinders();
+            var binders = ((FilterRequest)resultModel).GetBinders();
             foreach (var binder in binders)
             {
                 var valueProviderResult = bindingContext.ValueProvider.GetValue(binder.PropertyName);

@@ -83,7 +83,7 @@ namespace LHSBrackets.ModelBinder.EF
         {
             if (!(expression.Body is MemberExpression memberExpression))
             {
-                memberExpression = ((UnaryExpression)expression.Body).Operand as MemberExpression;
+                memberExpression = (MemberExpression)((UnaryExpression)expression.Body).Operand;
             }
 
             return memberExpression.ToString().Substring(2);
@@ -101,7 +101,7 @@ namespace LHSBrackets.ModelBinder.EF
             var rightUnderlyingType = values.GetType().GetGenericArguments()[0];
 
             if (IsNullableType(left.Type))
-                left = Expression.Convert(left, Nullable.GetUnderlyingType(left.Type));
+                left = Expression.Convert(left, Nullable.GetUnderlyingType(left.Type)!);
 
             if (IsNullableType(rightUnderlyingType))
                 values = values.Select(x => (TKey)x).ToList();
@@ -117,7 +117,7 @@ namespace LHSBrackets.ModelBinder.EF
             Func<Expression, Expression, Expression> expressionOperator,
             Expression left, TKey value) where TKey : struct
         {
-            Expression right = null;
+            Expression right;
             if (IsNullableType(left.Type) && !IsNullableType(typeof(TKey)))
             {
 
