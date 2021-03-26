@@ -11,8 +11,8 @@ jobs:
       - uses: actions/checkout@v2
 
       # Publish LHSBrackets.ModelBinder
-      - name: publish LHSBrackets.ModelBinder
-        id: publish_LHSBrackets.ModelBinder
+      - name: publish on version change
+        id: publish_nuget
         uses: rohith/publish-nuget@v2
         with:
           # Filepath of the project to be packaged, relative to root of repository
@@ -25,8 +25,8 @@ jobs:
           NUGET_KEY: ${{secrets.NUGET_API_KEY}}
 
         # Publish LHSBrackets.ModelBinder.EF
-      - name: publish LHSBrackets.ModelBinder.EF
-        id: publish_LHSBrackets.ModelBinder.EF
+      - name: publish on version change
+        id: publish_nuget
         uses: rohith/publish-nuget@v2
         with:
           # Filepath of the project to be packaged, relative to root of repository
