@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
+using System.Threading;
 
 namespace LHSBrackets.ModelBinder
 {
@@ -48,7 +50,7 @@ namespace LHSBrackets.ModelBinder
             object convertedValue;
             try
             {
-                convertedValue = converter.ConvertFromString(value);
+                convertedValue = converter.ConvertFromString(null, new CultureInfo("en-GB"), value);
             }
             catch (NotSupportedException)
             {

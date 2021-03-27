@@ -22,12 +22,16 @@ namespace LHSBrackets.ModelBinder.Example
         {
             services.AddDbContext<AppDbContext>(opts =>
             {
-                opts.UseSqlite(@"Data Source=.\books.db");
+                opts.UseSqlite(@"Data Source=.\bookstore.db");
             });
 
-            services.AddControllers().AddJsonOptions(x =>
+            services.AddControllers(options =>
             {
-                x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+                options.ModelBinderProviders.Insert(0, new FilterModelBinderProvider());
+
+            }).AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
             });
         }
 

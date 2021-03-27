@@ -16,7 +16,9 @@ Supported operators:
 - [in] - _contained in array_
 - [nin] - _not contained in array_
 
-Example request: `GET https://localhost:3000/api/invoices?paymentDate[lte]=2021-03-25&customerId[in]=1,2,3&totalAmount[gt]=500`
+Example request: `GET https://localhost:3000/api/books?releaseDate[gte]=2021-01-01&authorId[in]=1,2,3&price[lt]=10`
+
+The model binder is using en-GB culture for now. TODO: take this as a configuration input instead.
 
 ```csharp
 TODO: code examples

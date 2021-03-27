@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LHSBrackets.ModelBinder.Example.Database.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20210326220910_init")]
-    partial class init
+    [Migration("20210327140501_Init")]
+    partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -50,6 +50,9 @@ namespace LHSBrackets.ModelBinder.Example.Database.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("Price")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("ReleaseDate")

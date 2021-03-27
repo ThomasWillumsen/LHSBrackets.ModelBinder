@@ -42,16 +42,14 @@ namespace LHSBrackets.ModelBinder.EF
         }
 
         /// <summary>
-        /// it is nasty af to work with list of nullables so we just use right hand side as it is and convert left to be the same
+        /// it is nasty AF to work with list of nullables so we just use right hand side's type as it is and convert left to be the same
         /// </summary>
         private static Expression<Func<TEntity, bool>> CreateContainsExpression<TEntity, TKey>(
             Expression<Func<TEntity, TKey>> selector,
             List<TKey> values,
             bool invert = false)
         {
-            var parameter = Expression.Parameter(typeof(TEntity));
-            var parameterName = GetParameterName(selector);
-            Expression left = Expression.Property(parameter, parameterName);
+            (var left, var param) = CreateLeftExpression(selector);
             left = Expression.Convert(left, typeof(TKey));
             Expression right = Expression.Constant(values);
 
@@ -62,7 +60,7 @@ namespace LHSBrackets.ModelBinder.EF
             Expression containsExpression = Expression.Call(containsMethod, right, left);
             if (invert == true) containsExpression = Expression.Not(containsExpression);
 
-            var lambdaExpression = Expression.Lambda<Func<TEntity, bool>>(containsExpression, parameter);
+            var lambdaExpression = Expression.Lambda<Func<TEntity, bool>>(containsExpression, param);
             return lambdaExpression;
         }
 
@@ -71,16 +69,31 @@ namespace LHSBrackets.ModelBinder.EF
             Expression<Func<TEntity, TKey>> selector,
             TKey value)
         {
+            (var left, var param) = CreateLeftExpression(selector);
             var nullableType = MakeNullableType(typeof(TKey)); // we need to convert stuff to the same type so they are aligned
-            var parameter = Expression.Parameter(typeof(TEntity));
-            var parameterName = GetParameterName(selector);
-            Expression left = Expression.Property(parameter, parameterName);
             left = Expression.Convert(left, nullableType);
             Expression right = Expression.Constant(value, nullableType);
 
             var finalExpression = expressionOperator.Invoke(left, right);
-            var lambdaExpression = Expression.Lambda<Func<TEntity, bool>>(finalExpression, parameter);
+            var lambdaExpression = Expression.Lambda<Func<TEntity, bool>>(finalExpression, param);
             return lambdaExpression;
+        }
+
+        /// <summary>
+        /// This will take care of nested navigation properties as well
+        /// </summary>
+        static (Expression Left, ParameterExpression Param) CreateLeftExpression<TEntity, TKey>(Expression<Func<TEntity, TKey>> selector)
+        {
+            var parameterName = "x";
+            var parameter = Expression.Parameter(typeof(TEntity), parameterName);
+
+            var propertyName = GetParameterName(selector);
+            var memberExpression = (Expression)parameter;
+            foreach (var member in propertyName.Split('.').Skip(1))
+            {
+                memberExpression = Expression.PropertyOrField(memberExpression, member);
+            }
+            return (memberExpression, parameter);
         }
 
         private static string GetParameterName<TEntity, TKey>(Expression<Func<TEntity, TKey>> expression)
@@ -91,7 +104,8 @@ namespace LHSBrackets.ModelBinder.EF
                 memberExpression = (MemberExpression)((UnaryExpression)expression.Body).Operand;
             }
 
-            return memberExpression.ToString().Substring(2);
+            // // x.Category.Name will become Name
+            return memberExpression.ToString();
         }
 
         private static Type MakeNullableType(Type type)

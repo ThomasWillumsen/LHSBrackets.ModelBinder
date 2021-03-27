@@ -2,6 +2,7 @@ using LHSBrackets.ModelBinder.EF;
 using LHSBrackets.ModelBinder.Example.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -22,16 +23,19 @@ namespace LHSBrackets.ModelBinder.Example.Controllers.Rentals
 
         [HttpGet]
         public async Task<IActionResult> GetBooks(
-            [FromQuery][ModelBinder(typeof(FilterModelBinder))] BooksFilterRequest filters
+            [FromQuery] BooksFilterRequest filterRequest,
+            [FromQuery] string someOtherRandomQuery
         )
         {
             var books = await _dbContext.Books
-                .ApplyFilters(x => x.AuthorId, filters.AuthorId)
-                .ApplyFilters(x => x.ReleaseDate, filters.ReleaseDate)
-                .ApplyFilters(x => x.CategoryId, filters.CategoryId)
-                .ApplyFilters(x => x.Name, filters.Name)
-                // .ApplyFilters(x => x.Category.Name, filters.CategoryName)
-                .ApplyFilters(x => x.Difficulty, filters.Difficulty)
+                // .Include(x => x.Category)
+                .ApplyFilters(x => x.AuthorId, filterRequest.AuthorId)
+                .ApplyFilters(x => x.ReleaseDate, filterRequest.ReleaseDate)
+                .ApplyFilters(x => x.CategoryId, filterRequest.CategoryId)
+                .ApplyFilters(x => x.Name, filterRequest.Name)
+                .ApplyFilters(x => x.Category.Name, filterRequest.CategoryName)
+                .ApplyFilters(x => x.Price, filterRequest.Price)
+                .ApplyFilters(x => x.Difficulty, filterRequest.Difficulty)
                 .ToListAsync();
 
             return Ok(books);

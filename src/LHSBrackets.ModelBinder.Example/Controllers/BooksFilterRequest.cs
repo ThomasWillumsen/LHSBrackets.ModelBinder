@@ -9,8 +9,9 @@ namespace LHSBrackets.ModelBinder.Example.Controllers.Rentals
         public FilterOperations<Guid?> AuthorId { get; set; } = new FilterOperations<Guid?>();
         public FilterOperations<DateTime?> ReleaseDate { get; set; } = new FilterOperations<DateTime?>();
         public FilterOperations<int?> CategoryId { get; set; } = new FilterOperations<int?>();
+        public FilterOperations<decimal?> Price { get; set; } = new FilterOperations<decimal?>();
         public FilterOperations<string> Name { get; set; } = new FilterOperations<string>();
-        // public FilterOperations<string> CategoryName { get; set; } = new FilterOperations<string>();
+        public FilterOperations<string> CategoryName { get; set; } = new FilterOperations<string>();
         public FilterOperations<DifficultyEnum?> Difficulty { get; set; } = new FilterOperations<DifficultyEnum?>();
 
 
@@ -20,7 +21,8 @@ namespace LHSBrackets.ModelBinder.Example.Controllers.Rentals
 
             binders.AddRange(BuildFilterOperationBinders(AuthorId, nameof(AuthorId)));
             binders.AddRange(BuildFilterOperationBinders(ReleaseDate, nameof(ReleaseDate)));
-            // binders.AddRange(BuildFilterOperationBinders(CategoryName, nameof(CategoryName)));
+            binders.AddRange(BuildFilterOperationBinders(CategoryName, nameof(CategoryName)));
+            binders.AddRange(BuildFilterOperationBinders(Price, nameof(Price)));
             binders.AddRange(BuildFilterOperationBinders(Name, nameof(Name)));
             binders.AddRange(BuildFilterOperationBinders(CategoryId, nameof(CategoryId)));
             binders.AddRange(BuildFilterOperationBinders(Difficulty, nameof(Difficulty)));
