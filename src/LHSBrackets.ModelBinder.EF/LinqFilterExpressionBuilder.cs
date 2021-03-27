@@ -41,6 +41,9 @@ namespace LHSBrackets.ModelBinder.EF
             return expressions;
         }
 
+        /// <summary>
+        /// it is nasty af to work with list of nullables so we just use right hand side as it is and convert left to be the same
+        /// </summary>
         private static Expression<Func<TEntity, bool>> CreateContainsExpression<TEntity, TKey>(
             Expression<Func<TEntity, TKey>> selector,
             List<TKey> values,
@@ -49,7 +52,7 @@ namespace LHSBrackets.ModelBinder.EF
             var parameter = Expression.Parameter(typeof(TEntity));
             var parameterName = GetParameterName(selector);
             Expression left = Expression.Property(parameter, parameterName);
-            left = Expression.Convert(left, typeof(TKey)); // this is necessary in case TKey is nullable and property isnt
+            left = Expression.Convert(left, typeof(TKey));
             Expression right = Expression.Constant(values);
 
             var containsMethodRef = typeof(Enumerable).GetMethods(BindingFlags.Static | BindingFlags.Public)
@@ -68,12 +71,12 @@ namespace LHSBrackets.ModelBinder.EF
             Expression<Func<TEntity, TKey>> selector,
             TKey value)
         {
+            var nullableType = MakeNullableType(typeof(TKey)); // we need to convert stuff to the same type so they are aligned
             var parameter = Expression.Parameter(typeof(TEntity));
             var parameterName = GetParameterName(selector);
             Expression left = Expression.Property(parameter, parameterName);
-            // we need to convert stuff to the same type so they are aligned
-            left = Expression.Convert(left, typeof(TKey));
-            Expression right = Expression.Constant(value, typeof(TKey));
+            left = Expression.Convert(left, nullableType);
+            Expression right = Expression.Constant(value, nullableType);
 
             var finalExpression = expressionOperator.Invoke(left, right);
             var lambdaExpression = Expression.Lambda<Func<TEntity, bool>>(finalExpression, parameter);
@@ -91,14 +94,15 @@ namespace LHSBrackets.ModelBinder.EF
             return memberExpression.ToString().Substring(2);
         }
 
-        private static bool IsNullableType(Type t)
+        private static Type MakeNullableType(Type type)
         {
-            return t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>);
-        }
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+                return type;
 
-        private static T Cast<T>(object o)
-        {
-            return (T)o;
+            if (type == typeof(string))
+                return type;
+
+            return typeof(Nullable<>).MakeGenericType(type);
         }
     }
 }
