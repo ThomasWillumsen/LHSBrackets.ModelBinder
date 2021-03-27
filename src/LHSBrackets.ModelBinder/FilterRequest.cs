@@ -6,9 +6,9 @@ namespace LHSBrackets.ModelBinder
 {
     public abstract class FilterRequest
     {
-        public abstract IEnumerable<(string PropertyName, Action<string> BindValue)> GetBinders();
+        public abstract IEnumerable<(string PropertyName, Action<string> BindValue)> GetPropertyBinders();
 
-        protected IEnumerable<(string PropertyName, Action<string> Bind)> BuildFilterOperationBinders<T>(
+        protected IEnumerable<(string PropertyName, Action<string> Bind)> GetPropertyBinder<T>(
             FilterOperations<T> filterWrapper,
             string dictName)
         {

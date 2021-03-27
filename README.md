@@ -2,7 +2,6 @@
 
 A .NET modelbinder for parsing query parameters that use the LHS Brackets syntax commonly used in REST APIs.
 
-**Package** TODO
 **Platforms** - .NET 5.0
 
 Supported operators:
@@ -18,8 +17,74 @@ Supported operators:
 
 Example request: `GET https://localhost:3000/api/books?releaseDate[gte]=2021-01-01&authorId[in]=1,2,3&price[lt]=10`
 
-The model binder is using en-GB culture for now. TODO: take this as a configuration input instead.
+### Model binding
+
+[LHSBrackets.ModelBinder](https://www.nuget.org/packages/LHSBrackets.ModelBinder/)
+
+The model binder is using en-GB culture for now. Might be updated to take a culture input at a later date.
 
 ```csharp
-TODO: code examples
+// Startup.cs
+services.AddControllers(options => {
+    options.ModelBinderProviders.Insert(0, new FilterModelBinderProvider());
+})
 ```
+
+```csharp
+// Define your own request model that implements FilterRequest
+public class BooksFilterRequest : FilterRequest
+    {
+        // Use nullable generics or strings
+        public FilterOperations<Guid?> AuthorId { get; set; } = new FilterOperations<Guid?>();
+        public FilterOperations<DateTime?> ReleaseDate { get; set; } = new FilterOperations<DateTime?>();
+        public FilterOperations<decimal?> Price { get; set; } = new FilterOperations<decimal?>();
+
+        public override IEnumerable<(string PropertyName, Action<string> BindValue)> GetPropertyBinders()
+        {
+            var binders = new List<(string PropertyName, Action<string> BindValue)>();
+            binders.AddRange(base.GetPropertyBinder(AuthorId, nameof(AuthorId)));
+            binders.AddRange(base.GetPropertyBinder(ReleaseDate, nameof(ReleaseDate)));
+            binders.AddRange(base.GetPropertyBinder(Price, nameof(Price)));
+            return binders;
+        }
+    }
+```
+
+```csharp
+// Controller action - GET request
+[HttpGet]
+public async Task<IActionResult> GetBooks(
+    [FromQuery] BooksFilterRequest filterRequest, // this uses the LHSBrackets model binder
+    [FromQuery] string someOtherRandomQuery // this uses the built-in model binder
+)
+{
+    // stuff
+}
+```
+
+### Entity Framework
+
+[LHSBrackets.ModelBinder.EF](https://www.nuget.org/packages/LHSBrackets.ModelBinder.EF/)
+
+You can apply the filters to Linq statements for database queries.
+This will apply all LHS bracket-operations from the filter request that have values.
+Null-values are ignored.
+
+```csharp
+[HttpGet]
+public async Task<IActionResult> GetBooks([FromQuery] BooksFilterRequest filterRequest)
+{
+    var books = await _dbContext.Books
+        .ApplyFilters(x => x.AuthorId, filterRequest.AuthorId)
+        .ApplyFilters(x => x.ReleaseDate, filterRequest.ReleaseDate)
+        .ApplyFilters(x => x.Price, filterRequest.Price)
+        .ToListAsync();
+}
+
+```
+
+### Swagger (upcoming)
+
+_nuget: LHSBrackets.ModelBinder.Swashbuckle_
+
+Swashbuckle support for generating accurate openapi 3.0 specifications coming up.
