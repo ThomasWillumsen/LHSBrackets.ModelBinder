@@ -10,8 +10,13 @@ namespace LHSBrackets.ModelBinder
 
         protected IEnumerable<(string PropertyName, Action<string> Bind)> BuildFilterOperationBinders<T>(
             FilterOperations<T> filterWrapper,
-            string dictName) where T : struct
+            string dictName)
         {
+            var t = typeof(T);
+            if (t != typeof(string)
+                && (t.IsGenericType == false || t.GetGenericTypeDefinition() != typeof(Nullable<>)))
+                throw new ArgumentException("generic parameter T must be of type string or a nullable struct type");
+
             var operations = Enum.GetValues(typeof(FilterOperationEnum)).Cast<FilterOperationEnum>();
             List<(string PropertyName, Action<string> Bind)> binders = operations
                 .Select(operation =>

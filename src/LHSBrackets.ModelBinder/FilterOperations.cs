@@ -5,14 +5,14 @@ using System.Linq;
 
 namespace LHSBrackets.ModelBinder
 {
-    public class FilterOperations<T> where T : struct
+    public class FilterOperations<T>
     {
-        public Nullable<T> EQ { get; set; }
-        public Nullable<T> NE { get; set; }
-        public Nullable<T> GT { get; set; }
-        public Nullable<T> GTE { get; set; }
-        public Nullable<T> LT { get; set; }
-        public Nullable<T> LTE { get; set; }
+        public T? EQ { get; set; }
+        public T? NE { get; set; }
+        public T? GT { get; set; }
+        public T? GTE { get; set; }
+        public T? LT { get; set; }
+        public T? LTE { get; set; }
         public List<T> IN { get; set; } = new List<T>();
         public List<T> NIN { get; set; } = new List<T>();
 
@@ -52,6 +52,7 @@ namespace LHSBrackets.ModelBinder
             }
             catch (NotSupportedException)
             {
+                //RatherEasys is not a valid value for DifficultyEnum
                 throw;
                 // do stuff
             }
