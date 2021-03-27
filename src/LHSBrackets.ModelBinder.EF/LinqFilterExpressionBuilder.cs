@@ -99,22 +99,8 @@ namespace LHSBrackets.ModelBinder.EF
             var parameter = Expression.Parameter(typeof(TEntity));
             var parameterName = GetParameterName(selector);
             Expression left = Expression.Property(parameter, parameterName);
-
-            Expression right;
-            if (IsNullableType(left.Type) && !IsNullableType(typeof(TKey)))
-            {
-
-                right = Expression.Constant(value, typeof(Nullable<>).MakeGenericType(typeof(TKey)));
-            }
-            else
-            {
-                right = Expression.Constant(value, typeof(TKey));
-            }
-
-            if (!IsNullableType(left.Type) && IsNullableType(right.Type))
-            {
-                left = Expression.Convert(left, typeof(TKey));
-            }
+            Expression right = Expression.Constant(value);
+            right = Expression.Convert(right, left.Type);
 
             var finalExpression = expressionOperator.Invoke(left, right);
             var lambdaExpression = Expression.Lambda<Func<TEntity, bool>>(finalExpression, parameter);
