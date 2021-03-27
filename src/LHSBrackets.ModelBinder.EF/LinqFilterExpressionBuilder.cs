@@ -41,7 +41,6 @@ namespace LHSBrackets.ModelBinder.EF
             return expressions;
         }
 
-        // if more nullable generic issues arrise Expression.Convert may be worth looking into.
         private static Expression<Func<TEntity, bool>> CreateContainsExpression<TEntity, TKey>(
             Expression<Func<TEntity, TKey>> selector,
             List<TKey> values,
@@ -49,45 +48,18 @@ namespace LHSBrackets.ModelBinder.EF
         {
             var parameter = Expression.Parameter(typeof(TEntity));
             var parameterName = GetParameterName(selector);
-            Expression leftExp = Expression.Property(parameter, parameterName);
+            Expression left = Expression.Property(parameter, parameterName);
+            left = Expression.Convert(left, typeof(TKey)); // this is necessary in case TKey is nullable and property isnt
+            Expression right = Expression.Constant(values);
 
-
-            var containsMethod = typeof(Enumerable).GetMethods(BindingFlags.Static | BindingFlags.Public)
+            var containsMethodRef = typeof(Enumerable).GetMethods(BindingFlags.Static | BindingFlags.Public)
                    .Single(m => m.Name == nameof(Enumerable.Contains) && m.GetParameters().Length == 2);
-            MethodInfo contains = containsMethod.MakeGenericMethod(typeof(TKey));
+            MethodInfo containsMethod = containsMethodRef.MakeGenericMethod(typeof(TKey));
 
-            var underlyingTKeyType = Nullable.GetUnderlyingType(typeof(TKey)) ?? typeof(TKey);
-            var rightListItemType = values.GetType().GetGenericArguments()[0];
-            Expression rightExp = Expression.Constant(values);
-
-            if (IsNullableType(typeof(TKey)))
-            {
-                if (!IsNullableType(leftExp.Type))
-                    leftExp = Expression.Convert(leftExp, typeof(Nullable<>).MakeGenericType(leftExp.Type));
-
-                if (!IsNullableType(rightListItemType))
-                {
-                    rightExp = Expression.Constant(values, typeof(Nullable<>).MakeGenericType(underlyingTKeyType));
-                }
-
-            }
-            else
-            {
-                if (IsNullableType(leftExp.Type))
-                    leftExp = Expression.Convert(leftExp, Nullable.GetUnderlyingType(leftExp.Type)!);
-
-                if (IsNullableType(rightListItemType))
-                    rightExp = Expression.Constant(values);
-            }
-
-            Expression containsExpression = Expression.Call(
-                contains,
-                rightExp,
-                leftExp);
-
+            Expression containsExpression = Expression.Call(containsMethod, right, left);
             if (invert == true) containsExpression = Expression.Not(containsExpression);
-            var lambdaExpression = Expression.Lambda<Func<TEntity, bool>>(containsExpression, parameter);
 
+            var lambdaExpression = Expression.Lambda<Func<TEntity, bool>>(containsExpression, parameter);
             return lambdaExpression;
         }
 
@@ -99,8 +71,9 @@ namespace LHSBrackets.ModelBinder.EF
             var parameter = Expression.Parameter(typeof(TEntity));
             var parameterName = GetParameterName(selector);
             Expression left = Expression.Property(parameter, parameterName);
-            Expression right = Expression.Constant(value);
-            right = Expression.Convert(right, left.Type);
+            // we need to convert stuff to the same type so they are aligned
+            left = Expression.Convert(left, typeof(TKey));
+            Expression right = Expression.Constant(value, typeof(TKey));
 
             var finalExpression = expressionOperator.Invoke(left, right);
             var lambdaExpression = Expression.Lambda<Func<TEntity, bool>>(finalExpression, parameter);
@@ -121,6 +94,11 @@ namespace LHSBrackets.ModelBinder.EF
         private static bool IsNullableType(Type t)
         {
             return t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>);
+        }
+
+        private static T Cast<T>(object o)
+        {
+            return (T)o;
         }
     }
 }
