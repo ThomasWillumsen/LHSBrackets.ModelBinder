@@ -25,14 +25,12 @@ namespace LHSBrackets.ModelBinder.Example
                 opts.UseSqlite(@"Data Source=.\bookstore.db");
             });
 
-            services.AddControllers(options =>
-            {
-                options.ModelBinderProviders.Insert(0, new FilterModelBinderProvider());
-
-            }).AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
-            });
+            services
+                .AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+                });
         }
 
 

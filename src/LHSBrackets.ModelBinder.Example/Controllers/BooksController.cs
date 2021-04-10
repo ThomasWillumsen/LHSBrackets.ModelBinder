@@ -23,8 +23,8 @@ namespace LHSBrackets.ModelBinder.Example.Controllers.Rentals
 
         [HttpGet]
         public async Task<IActionResult> GetBooks(
-            [FromQuery] BooksFilterRequest filterRequest,
-            [FromQuery] string someOtherRandomQuery
+            [FromQuery] Filters<Guid>? authorId,
+            [FromQuery] string? someOtherRandomQuery
         )
         {
             var books = await _dbContext.Books

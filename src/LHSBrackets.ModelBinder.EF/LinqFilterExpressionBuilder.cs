@@ -11,7 +11,7 @@ namespace LHSBrackets.ModelBinder.EF
         public static IQueryable<TEntity> ApplyFilters<TEntity, TKey>(
             this IQueryable<TEntity> source,
             Expression<Func<TEntity, TKey>> selector,
-            FilterOperations<TKey> filters)
+            Filters<TKey> filters)
         {
             var filterExpressions = new List<Expression<Func<TEntity, bool>>>();
 
@@ -25,7 +25,7 @@ namespace LHSBrackets.ModelBinder.EF
 
         }
 
-        private static List<Expression<Func<TEntity, bool>>> CreateFilters<TEntity, TKey>(Expression<Func<TEntity, TKey>> selector, FilterOperations<TKey> filters)
+        private static List<Expression<Func<TEntity, bool>>> CreateFilters<TEntity, TKey>(Expression<Func<TEntity, TKey>> selector, Filters<TKey> filters)
         {
             var expressions = new List<Expression<Func<TEntity, bool>>>();
 

@@ -1,6 +1,6 @@
 namespace LHSBrackets.ModelBinder
 {
-    public enum FilterOperationEnum
+    public enum FilterModifier
     {
         Eq,
         Ne,
