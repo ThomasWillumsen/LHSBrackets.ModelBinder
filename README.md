@@ -31,22 +31,12 @@ services.AddControllers(options => {
 ```
 
 ```csharp
-// Define your own request model that implements FilterRequest
+// Define your own request model that derives from FilterRequest
 public class BooksFilterRequest : FilterRequest
     {
-        // Use nullable generics or strings
-        public FilterOperations<Guid?> AuthorId { get; set; } = new FilterOperations<Guid?>();
-        public FilterOperations<DateTime?> ReleaseDate { get; set; } = new FilterOperations<DateTime?>();
-        public FilterOperations<decimal?> Price { get; set; } = new FilterOperations<decimal?>();
-
-        public override IEnumerable<(string PropertyName, Action<string> BindValue)> GetPropertyBinders()
-        {
-            var binders = new List<(string PropertyName, Action<string> BindValue)>();
-            binders.AddRange(base.GetPropertyBinder(AuthorId, nameof(AuthorId)));
-            binders.AddRange(base.GetPropertyBinder(ReleaseDate, nameof(ReleaseDate)));
-            binders.AddRange(base.GetPropertyBinder(Price, nameof(Price)));
-            return binders;
-        }
+        public FilterOperations<Guid> AuthorId { get; set; }
+        public FilterOperations<DateTime> ReleaseDate { get; set; }
+        public FilterOperations<decimal?> Price { get; set; }
     }
 ```
 
@@ -55,7 +45,7 @@ public class BooksFilterRequest : FilterRequest
 [HttpGet]
 public async Task<IActionResult> GetBooks(
     [FromQuery] BooksFilterRequest filterRequest, // this uses the LHSBrackets model binder
-    [FromQuery] string someOtherRandomQuery // this uses the built-in model binder
+    [FromQuery] string? someOtherRandomQuery // this uses the built-in model binder
 )
 {
     // stuff
@@ -68,7 +58,6 @@ public async Task<IActionResult> GetBooks(
 
 You can apply the filters to Linq statements for database queries.
 This will apply all LHS bracket-operations from the filter request that have values.
-Null-values are ignored.
 
 ```csharp
 [HttpGet]
