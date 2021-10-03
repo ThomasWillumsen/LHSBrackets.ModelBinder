@@ -24,11 +24,11 @@ namespace LHSBrackets.ModelBinder.Example.Controllers.Rentals
         [HttpGet]
         public async Task<IActionResult> GetBooks(
             [FromQuery] BooksFilterRequest filterRequest,
-            [FromQuery] string someOtherRandomQuery
+            [FromQuery] string? someOtherRandomQuery
         )
         {
             var books = await _dbContext.Books
-                // .Include(x => x.Category)
+                .Include(x => x.Category)
                 .ApplyFilters(x => x.AuthorId, filterRequest.AuthorId)
                 .ApplyFilters(x => x.ReleaseDate, filterRequest.ReleaseDate)
                 .ApplyFilters(x => x.CategoryId, filterRequest.CategoryId)

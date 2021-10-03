@@ -7,7 +7,7 @@ namespace LHSBrackets.ModelBinder.Example.Database
 {
     public class Book
     {
-        public Book(string name, DateTime releaseDate, DifficultyEnum difficulty, decimal price)
+        public Book(string name, DateTime releaseDate, DifficultyEnum difficulty, decimal? price)
         {
             Name = name;
             ReleaseDate = releaseDate;
@@ -18,7 +18,7 @@ namespace LHSBrackets.ModelBinder.Example.Database
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public string Name { get; set; }
-        public decimal Price { get; set; }
+        public decimal? Price { get; set; }
         public DateTime ReleaseDate { get; set; }
         public DifficultyEnum Difficulty { get; set; }
         public int CategoryId { get; set; }

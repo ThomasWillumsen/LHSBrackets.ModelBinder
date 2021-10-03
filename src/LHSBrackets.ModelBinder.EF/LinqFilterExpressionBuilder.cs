@@ -11,8 +11,11 @@ namespace LHSBrackets.ModelBinder.EF
         public static IQueryable<TEntity> ApplyFilters<TEntity, TKey>(
             this IQueryable<TEntity> source,
             Expression<Func<TEntity, TKey>> selector,
-            FilterOperations<TKey> filters)
+            FilterOperations<TKey>? filters)
         {
+            if(filters == null)
+                return source;
+
             var filterExpressions = new List<Expression<Func<TEntity, bool>>>();
 
             filterExpressions.AddRange(CreateFilters<TEntity, TKey>(selector, filters));
@@ -25,28 +28,46 @@ namespace LHSBrackets.ModelBinder.EF
 
         }
 
-        private static List<Expression<Func<TEntity, bool>>> CreateFilters<TEntity, TKey>(Expression<Func<TEntity, TKey>> selector, FilterOperations<TKey> filters)
+        private static Func<Expression, Expression, Expression> MapOperationToLinqExpression(FilterOperationEnum filterOperationType) 
+        {
+            switch(filterOperationType){
+                case FilterOperationEnum.Eq: return Expression.Equal;
+                case FilterOperationEnum.Ne: return Expression.NotEqual;
+                case FilterOperationEnum.Gt: return Expression.GreaterThan;
+                case FilterOperationEnum.Gte: return Expression.GreaterThanOrEqual;
+                case FilterOperationEnum.Lt: return Expression.LessThan;
+                case FilterOperationEnum.Lte: return Expression.LessThanOrEqual;
+                default: throw new Exception($"Couldn't map enum: {filterOperationType.ToString()}");
+            }
+        }
+
+        private static List<Expression<Func<TEntity, bool>>> CreateFilters<TEntity, TKey>(Expression<Func<TEntity, TKey>> selector, FilterOperations<TKey> filterOperations)
         {
             var expressions = new List<Expression<Func<TEntity, bool>>>();
 
-            if (filters.EQ != null) expressions.Add(CreateBasicExpression(Expression.Equal, selector, filters.EQ));
-            if (filters.NE != null) expressions.Add(CreateBasicExpression(Expression.NotEqual, selector, filters.NE));
-            if (filters.GT != null) expressions.Add(CreateBasicExpression(Expression.GreaterThan, selector, filters.GT));
-            if (filters.GTE != null) expressions.Add(CreateBasicExpression(Expression.GreaterThanOrEqual, selector, filters.GTE));
-            if (filters.LT != null) expressions.Add(CreateBasicExpression(Expression.LessThan, selector, filters.LT));
-            if (filters.LTE != null) expressions.Add(CreateBasicExpression(Expression.LessThanOrEqual, selector, filters.LTE));
-            if (filters.IN?.Any() == true) expressions.Add(CreateContainsExpression(selector, filters.IN));
-            if (filters.NIN?.Any() == true) expressions.Add(CreateContainsExpression(selector, filters.NIN, true));
+            foreach(var filterOperation in filterOperations){
+                if(!filterOperation.hasMultipleValues && filterOperation.values.Count() > 0){
+                    var linqOperationExp = MapOperationToLinqExpression(filterOperation.operation);
+                    var linqExpression = CreateBasicExpression(linqOperationExp, selector, filterOperation.values.First());
+                    expressions.Add(linqExpression);
+                }
+                else{
+                    var linqContainsExpression = CreateContainsExpression(selector, filterOperation.values, filterOperation.operation == FilterOperationEnum.Nin);
+                    expressions.Add(linqContainsExpression);
+                }
+            }
 
             return expressions;
         }
+
+
 
         /// <summary>
         /// it is nasty AF to work with list of nullables so we just use right hand side's type as it is and convert left to be the same
         /// </summary>
         private static Expression<Func<TEntity, bool>> CreateContainsExpression<TEntity, TKey>(
             Expression<Func<TEntity, TKey>> selector,
-            List<TKey> values,
+            IEnumerable<TKey> values,
             bool invert = false)
         {
             (var left, var param) = CreateLeftExpression(selector);

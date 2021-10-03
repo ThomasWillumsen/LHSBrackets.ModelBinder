@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
@@ -7,40 +8,26 @@ using System.Threading;
 
 namespace LHSBrackets.ModelBinder
 {
-    public class FilterOperations<T>
+    public class FilterOperations<T> : List<(FilterOperationEnum operation, IEnumerable<T> values, bool hasMultipleValues)>
     {
-        public T? EQ { get; set; }
-        public T? NE { get; set; }
-        public T? GT { get; set; }
-        public T? GTE { get; set; }
-        public T? LT { get; set; }
-        public T? LTE { get; set; }
-        public List<T> IN { get; set; } = new List<T>();
-        public List<T> NIN { get; set; } = new List<T>();
-
         internal void SetValue(FilterOperationEnum operation, string value)
         {
-            if (operation == FilterOperationEnum.Eq)
-                EQ = (T)ConvertValue(value);
-            else if (operation == FilterOperationEnum.Ne)
-                NE = (T)ConvertValue(value);
-            else if (operation == FilterOperationEnum.Gt)
-                GT = (T)ConvertValue(value);
-            else if (operation == FilterOperationEnum.Gte)
-                GTE = (T)ConvertValue(value);
-            else if (operation == FilterOperationEnum.Lt)
-                LT = (T)ConvertValue(value);
-            else if (operation == FilterOperationEnum.Lte)
-                LTE = (T)ConvertValue(value);
-            else if (operation == FilterOperationEnum.In)
-            {
-                var items = value.Split(",");
-                IN.AddRange(items.Select(x => (T)ConvertValue(x.Trim(' '))));
-            }
-            else if (operation == FilterOperationEnum.Nin)
-            {
-                var items = value.Split(",");
-                NIN.AddRange(items.Select(x => (T)ConvertValue(x.Trim(' '))));
+            switch (operation){
+                case FilterOperationEnum.Eq:
+                case FilterOperationEnum.Ne:
+                case FilterOperationEnum.Gt:
+                case FilterOperationEnum.Gte:
+                case FilterOperationEnum.Lt:
+                case FilterOperationEnum.Lte:
+                    this.Add((operation, new List<T>{ (T)ConvertValue(value) }, false));
+                    break;
+                case FilterOperationEnum.In:
+                case FilterOperationEnum.Nin:
+                    var items = value.Split(",");
+                    this.Add((operation, items.Select(x => (T)ConvertValue(x.Trim(' '))), true));
+                    break;
+                default:
+                    throw new Exception($"Operation type: {operation.ToString()} is unhandled.");
             }
         }
 
@@ -56,7 +43,7 @@ namespace LHSBrackets.ModelBinder
             {
                 //RatherEasys is not a valid value for DifficultyEnum
                 throw;
-                // do stuff
+                // TODO: do stuff
             }
 
             return convertedValue;

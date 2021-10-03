@@ -6,7 +6,7 @@
     <Authors>Thomas Leschley Andersen</Authors>
     <Description>.NET Model binder for parsing query parameters that contains LHS Brackets</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageVersion>0.9.3</PackageVersion>
+    <PackageVersion>0.9.4</PackageVersion>
     <RepositoryUrl>https://github.com/ThomasLeschley/LHSBrackets.ModelBinder</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>modelbinder, parse, lhs brackets, query, filters, rest, api</PackageTags>

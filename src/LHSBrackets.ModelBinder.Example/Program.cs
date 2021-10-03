@@ -62,7 +62,7 @@ namespace LHSBrackets.ModelBinder.Example
                 new Book("Sure Søren", new DateTime(2021, 03, 25), DifficultyEnum.PrettyFuckingDifficult, 100m){Category = categories[0], Author = authors[1]},
                 new Book("Kradsbørstige Kurt", new DateTime(2021, 03, 29), DifficultyEnum.PrettyFuckingDifficult, 55.995m){Category = categories[1], Author = authors[1]},
                 new Book("Hurtige Henning", new DateTime(2021, 04, 10), DifficultyEnum.Medium, 10m){Category = categories[2], Author = authors[2]},
-                new Book("Overvægtige Ove", new DateTime(2021, 05, 20), DifficultyEnum.RatherEasy, 5m){Category = categories[3], Author = authors[3]},
+                new Book("Overvægtige Ove", new DateTime(2021, 05, 20), DifficultyEnum.RatherEasy, null){Category = categories[3], Author = authors[3]},
             };
 
             var dbContext = scope.ServiceProvider.GetService<AppDbContext>()!;

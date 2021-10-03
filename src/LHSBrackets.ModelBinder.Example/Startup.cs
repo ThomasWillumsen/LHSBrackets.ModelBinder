@@ -22,7 +22,7 @@ namespace LHSBrackets.ModelBinder.Example
         {
             services.AddDbContext<AppDbContext>(opts =>
             {
-                opts.UseSqlite(@"Data Source=.\bookstore.db");
+                opts.UseSqlite(@"Data Source=.\Database\bookstore.db");
             });
 
             services.AddControllers(options =>
